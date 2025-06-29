@@ -1,0 +1,118 @@
+enum userRoles {
+  ADMIN
+  JUDGE
+  SCHOOL
+}
+
+model Participants {
+  id            String             @id @default(cuid())
+  schoolId      String
+  competitionId String             @unique
+  status        APPLICATION_STATUS @default(PENDING)
+  createdAt     DateTime           @default(now()) @map("created_at")
+
+  school      School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  competition Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  marks       Marks[]
+
+  @@map("participants")
+}
+
+enum APPLICATION_STATUS {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+model Competition {
+  id                String             @id @default(cuid())
+  name              String
+  schedule          DateTime
+  description       String
+  venue             String
+  maxParticipants   Int                @default(0) @map("max_participants")
+  status            COMPETITION_STATUS @default(UPCOMING)
+  totalParticipants Int                @default(0) @map("total_participants")
+  judges            Judges[]           @relation("CompetitionJudges")
+  participants      Participants[]
+
+  @@map("competition")
+}
+
+enum COMPETITION_STATUS {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+}
+
+model Judges {
+  id           String        @id @default(cuid())
+  nationalId   String        @unique
+  userId       String        @unique
+  user         Users         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  competitions Competition[] @relation("CompetitionJudges")
+  marks        Marks[]
+
+  @@map("judges")
+}
+
+model Marks {
+  id        String   @id @default(cuid())
+  score     Int
+  comments  String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  judgeId       String
+  participantId String
+
+  judge       Judges       @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+  participant Participants @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@map("marks")
+}
+
+model School {
+  id          String         @id @default(cuid())
+  county      String
+  userId      String         @unique
+  user        Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participant Participants[]
+
+  @@map("school")
+}
+
+model Users {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  password     String
+  role         userRoles      @default(SCHOOL)
+  school       School?
+  judge        Judges?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now()) @updatedAt
+  verification Verifications?
+
+  @@index([createdAt, id], name: "judges_pagination")
+}
+
+model Verifications {
+  id        String   @id @default(cuid())
+  code      String
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  user      Users    @relation(fields: [userId], references: [id])
+
+  @@map("Verifications")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../../src/generated/prisma"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
