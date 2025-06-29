@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "./src/index.ts",
-  "scripts": {
-    "dev": "nodemon ./src/index.ts",
-    "build": "npm install  && npx tsc && cp -r ./src/generated ./dist/src/generated",
-    "start": "node ./dist/src/index.js"
-  },
+"scripts": {
+  "dev": "nodemon ./src/index.ts",
+  "build":"npx prisma generate && npx tsc && cp -r ./src/generated ./dist/src/generated",
+  "start": "node ./dist/src/index.js"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BRIANOMULAMI/Backend.git"
