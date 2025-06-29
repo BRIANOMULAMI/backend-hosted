@@ -113,7 +113,7 @@ const AuthUserLogin = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60 * 24,
-      sameSite:"lax"
+      sameSite:"none"
     });
     res.status(200).json({ message: "Login successful" });
     return;
@@ -128,7 +128,7 @@ const AuthUserLogout = (req: Request, res: Response) => {
   res.clearCookie("Bearer", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite:"lax"
+    sameSite:"none"
   });
   res.status(200).json({ message: "Logout successful" });
   return;
