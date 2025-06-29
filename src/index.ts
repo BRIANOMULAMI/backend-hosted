@@ -17,6 +17,8 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 export const db = new PrismaClient();
 
+console.log(process.env.FRONTEND_URL!)
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL!,
